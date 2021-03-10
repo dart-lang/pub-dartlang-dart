@@ -8,38 +8,20 @@ window.dataLayer.push({
   event: 'gtm.js'
 });
 
-function gtag() { dataLayer.push(arguments); }
 
 // Setup listening to send Google Analytics events when any element
 // with a 'data-ga-click-event' attribute is clicked.
 window.addEventListener('DOMContentLoaded', function () {
   function sendEvent(e) {
-    var elem = e.currentTarget;
-
-    var data = {
-      'event_category': 'click',
-      'event_label': 'path:' + window.location.pathname,
-      'value': 1
-    };
-
-    // Events on links should be sent via beacon, see:
-    // https://support.google.com/analytics/answer/7478520?hl=en
-    if (elem.hasAttribute('href')) {
-      var updated = false;
-      var callbackFn = function () {
-        if (updated) return;
-        updated = true;
-        document.location = elem.href;
-      };
-      data.event_callback = callbackFn;
-      data.transport_type = 'beacon';
-      e.preventDefault();
-
-      // Fallback location change in case the Google Tag Manager is blocked.
-      setTimeout(callbackFn, 100);
-    }
-
-    gtag('event', elem.dataset.gaClickEvent, data);
+    // Create a custom event in Google Tag Manager, which we then have
+    // configured GTM to forward to Google Analytics.
+    window.dataLayer.push({
+      event: 'custom-event',
+      customEventCategory: 'click',
+      customEventAction: e.currentTarget.dataset.gaClickEvent,
+      customEventLabel: 'path:' + window.location.pathname,
+      customEventValue: 1
+    });
   }
   function addListeners() {
     var elements = document.querySelectorAll('[data-ga-click-event]');
